@@ -1,10 +1,12 @@
-﻿using System;
+﻿using examenOptativoP.Modelos;
+using Repository.Data.Clientes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Repository.Data.Clientes
+namespace Service.logica
 {
     public class ClienteService: IClienteRepository
     {
@@ -39,18 +41,18 @@ namespace Repository.Data.Clientes
         {
             if (cliente == null)
                 return false;
-            if (string.IsNullOrEmpty(cliente.nom))
+            if (string.IsNullOrEmpty(cliente.nombre)||string.IsNullOrEmpty(cliente.apellido)||string.IsNullOrEmpty(cliente.documento))
                 return false;
-            if (string.IsNullOrEmpty(cliente.ape) && cliente.nom.Length < 2)
+            if (cliente.nombre.Length <3 || cliente.apellido.Length <3|| cliente.documento.Length <3)
                 return false;
-            if (string.IsNullOrEmpty(cliente.docu))
+            if (cliente.celular.Length<10)
                 return false;
 
             return true;
         }
-        public bool get(int id)
+        public ClienteModel get(int id)
         {
-            return true;
+            return clienteRepository.get(id);
         }
     }
 }

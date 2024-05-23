@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using examenOptativoP.Modelos;
 using Npgsql;
+using Repository.Data.Clientes;
 using Repository.Data.ConfiguracionesDB;
 using System;
 using System.Collections.Generic;
@@ -9,25 +10,25 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Repository.Data.Clientes
+namespace Repository.Data.Sucursales
 {
-    public class ClienteRepository : IClienteRepository
+    public class SucursalRepository : ISucursalRepository
     {
         IDbConnection connection;
         private string? conexionString;
 
-        public ClienteRepository(string conexionString)
+        public SucursalRepository(string conexionString)
         {
             this.conexionString = conexionString;
             connection = new ConexionDB(conexionString).OpenConnection();
         }
 
-        public bool add(ClienteModel clienteModel)
+        public bool add(SucursalModel sucursalModel)
         {
             try
             {
-                connection.Execute("INSERT INTO cliente(id_banco, nombre, apellido, documento, direccion, mail, celular, estado) " +
-                    $"Values(@id_banco, @nombre, @apellido, @documento, @direccion, @mail, @celular, @estado)", clienteModel);
+                connection.Execute("INSERT INTO sucursal(descripcion, direccion, telefono, whatsapp, email, estado) " +
+                    $"Values(@descripcion, @direccion, @telefono, @whatsapp, @email, @estado)", sucursalModel);
                 return true;
             }
             catch (Exception ex)
@@ -36,11 +37,11 @@ namespace Repository.Data.Clientes
             }
         }
 
-        public IEnumerable<ClienteModel> GetAll()
+        public IEnumerable<SucursalModel> GetAll()
         {
             try
             {
-                return connection.Query<ClienteModel>("SELECT * FROM cliente");
+                return connection.Query<SucursalModel>("SELECT * FROM sucursal");
             }
             catch (Exception ex)
             {
@@ -52,29 +53,28 @@ namespace Repository.Data.Clientes
         {
             try
             {
-                connection.Execute("DELETE FROM cliente WHERE id = @Id", new { Id = id });
+                connection.Execute("DELETE FROM sucursal WHERE id = @Id", new { Id = id });
                 return true;
             }
             catch (Exception ex)
             {
                 throw ex;
             }
+
         }
 
-        public bool update(ClienteModel clienteModel)
+        public bool update(SucursalModel sucursalModel)
         {
             try
             {
-                connection.Execute("UPDATE cliente SET " +
-                    " id_banco=@id_banco, " +
-                    " nombre=@nombre, " +
-                    " apellido=@apellido, " +
-                    " documento=@documento, " +
-                    " direccion=@direccion, " +
-                    " mail=@mail, " +
-                    " celular=@celular, " +
+                connection.Execute("UPDATE sucursal SET " +
+                    " Descripcion=@descripcion, " +
+                    " Direccion=@direccion, " +
+                    " Telefono=@telefono, " +
+                    " Whatsapp=@whatsapp, " +
+                    " email=@email, " +   
                     " estado=@estado " +
-                    $" WHERE  id = @id", clienteModel);
+                    $" WHERE  id = @id", sucursalModel);
                 return true;
             }
             catch (Exception ex)
@@ -82,16 +82,16 @@ namespace Repository.Data.Clientes
                 throw ex;
             }
         }
-        public ClienteModel get(int id)
+        public SucursalModel get(int id)
         {
             using (var connection = new NpgsqlConnection(conexionString))
             {
                 connection.Open();
 
-                string query = "SELECT * FROM cliente WHERE id = @Id";
-                var cliente = connection.QueryFirstOrDefault<ClienteModel>(query, new { Id = id });
+                string query = "SELECT * FROM sucursal WHERE id = @Id";
+                var sucursal = connection.QueryFirstOrDefault<SucursalModel>(query, new { Id = id });
 
-                return cliente;
+                return sucursal;
             }
         }
 
