@@ -15,8 +15,9 @@ class Program
         ClienteService clienteService = new ClienteService(connectionString);
         FacturaService facturaService = new FacturaService(connectionString);
         SucursalService sucursalService = new SucursalService(connectionString);
+        ProductoService productoService = new ProductoService(connectionString);
 
-        Console.WriteLine("Ingrese: \n Clientes \n a - para insertar \n b - para listar \n c - para modificar \n d - eliminar por ID \n e - buscar por ID \n Facturacion \n A - agregar factura \n B - listar facturas \n C - modificar facturas \n D - eliminar factura por ID \n E - buscar facturas por el ID \n consultas sucursales \n 1 - agregar sucursal \n 2 - listar sucursales \n 3 - modificar sucursal \n 4 - eliminar sucursal por ID \n 5 - buscar sucursales por ID");
+        Console.WriteLine("Ingrese: \n Clientes \n a - para insertar \n b - para listar \n c - para modificar \n d - eliminar por ID \n e - buscar por ID \n Facturacion \n A - agregar factura \n B - listar facturas \n C - modificar facturas \n D - eliminar factura por ID \n E - buscar facturas por el ID \n consultas sucursales \n 1 - agregar sucursal \n 2 - listar sucursales \n 3 - modificar sucursal \n 4 - eliminar sucursal por ID \n 5 - buscar sucursales por ID \n Productos \n t - agregar productos \n u - listar productos \n v - modificar productos \n w - eliminar productos por ID \n x - buscar productos por ID");
         string opcion = Console.ReadLine();
 
         if (opcion == "a")
@@ -95,9 +96,9 @@ class Program
         }
         if(opcion == "A")
         {
-            facturaService.add(new FacturaModel
+            var nuevaFactura = new FacturaModel
             {
-                id_cliente = 3,
+                id_cliente = 5,
                 id_sucursal = 1,
                 nro_factura = "479-090-973122",
                 fecha_hora = new DateTime(2024, 05, 10),
@@ -106,33 +107,56 @@ class Program
                 total_iva10 = 2500,
                 total_iva = 3750,
                 total_letras = "Doscientos cincuenta mil",
-                sucursal = "Asuncion"
-            });
+                sucursal = "Asuncion",
+                detalleFactura = new List<DetalleFacturaModel>
+                        {
+                            new DetalleFacturaModel { id_producto = 1, cantidad_producto = 1, subtotal = 120000 }
+                        }
+            };
+            facturaService.add(nuevaFactura);
         }
         if (opcion == "B")
         {
             facturaService.GetAll().ToList().ForEach(factura =>
-            Console.WriteLine(
-                $"ID: {factura.id} \n " +
-                $"ID Sucursal: {factura.id_sucursal} \n " +
-                $"ID Cliente: {factura.id_cliente} \n " +
-                $"Numero de factura: {factura.nro_factura} \n " +
-                $"Fecha y Hora: {factura.fecha_hora} \n " +
-                $"Total: {factura.total} \n " +
-                $"Total del IVA 5% {factura.total_iva5} \n " +
-                $"Total del IVA 10%: {factura.total_iva10} \n " +
-                $"Total en letras: {factura.total_letras} \n " +
-                $"Sucursal: {factura.sucursal} \n "
-                )
-            );
+            {
+                Console.WriteLine(
+                    $"ID: {factura.id} \n " +
+                    $"ID Sucursal: {factura.id_sucursal} \n " +
+                    $"ID Cliente: {factura.id_cliente} \n " +
+                    $"Numero de factura: {factura.nro_factura} \n " +
+                    $"Fecha y Hora: {factura.fecha_hora} \n " +
+                    $"Total: {factura.total} \n " +
+                    $"Total del IVA 5% {factura.total_iva5} \n " +
+                    $"Total del IVA 10%: {factura.total_iva10} \n " +
+                    $"Total en letras: {factura.total_letras} \n " +
+                    $"Sucursal: {factura.sucursal} \n "
+                    );
+                if (factura.detalleFactura != null && factura.detalleFactura.Any())
+                {
+                    Console.WriteLine("Detalles de la Factura:");
+                    foreach (var detalle in factura.detalleFactura)
+                    {
+                        Console.WriteLine(
+                            $"  ID Producto: {detalle.id_producto}\n" +
+                            $"  Cantidad de producto: {detalle.cantidad_producto}\n" +
+                            $"  Subtotal: {detalle.subtotal}\n");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("No hay detalles de la factura.");
+                }
+            }) ;
+            
         }
         if (opcion == "C")
         {
-            facturaService.update(new FacturaModel
+            var facturaActualizada = new FacturaModel
+
             {
                 id = 1,
                 id_cliente = 3,
-                id_sucursal=1,
+                id_sucursal = 1,
                 nro_factura = "479-090-973133",
                 fecha_hora = new DateTime(2024, 05, 21),
                 total = 250000,
@@ -140,8 +164,13 @@ class Program
                 total_iva10 = 2500,
                 total_iva = 3750,
                 total_letras = "Doscientos cincuenta mil",
-                sucursal = "Lambare"
-            });
+                sucursal = "Lambare",
+                detalleFactura = new List<DetalleFacturaModel>
+                {
+                    new DetalleFacturaModel { id = 1, id_producto = 1, cantidad_producto = 2, subtotal = 20000 },
+                }
+            };
+            facturaService.update(facturaActualizada);
         }
         if (opcion == "D")
         {
@@ -170,6 +199,15 @@ class Program
                     $"Total en letras: {factura.total_letras} \n" +
                     $"Sucursal: {factura.sucursal} \n"
                 );
+                Console.WriteLine("Detalles de la Factura:");
+                factura.detalleFactura.ToList().ForEach(detalle =>
+                {
+                    Console.WriteLine(
+                        $"ID Producto: {detalle.id_producto} \n " +
+                        $"Cantidad Producto: {detalle.cantidad_producto} \n " +
+                        $"Subtotal: {detalle.subtotal} \n"
+                    );
+                });
             }
             else
             {
@@ -243,6 +281,82 @@ class Program
             else
             {
                 Console.WriteLine("Sucursal no encontrada.");
+            }
+        }
+        if (opcion == "t")
+        {
+            productoService.add(new ProductoModel
+            {
+                descripcion = "Coca cola 3 lts.",
+                cantidad_minima = 2,
+                cantidad_stock = 3,
+                precio_compra = 12000,
+                precio_venta = 18000,
+                categoria = "gaseosa",
+                marca = "coca cola",
+                estado = "disponible"
+            });
+        }
+        if (opcion == "u")
+        {
+            productoService.GetAll().ToList().ForEach(productos =>
+            Console.WriteLine(
+                $"ID: {productos.id} \n " +
+                $"Descripcion: {productos.descripcion} \n " +
+                $"Cantidad Minima: {productos.cantidad_minima} \n " +
+                $"Cantidad Stock: {productos.cantidad_stock} \n " +
+                $"Precio compra: {productos.precio_compra} \n " +
+                $"Precio venta {productos.precio_venta} \n " +
+                $"Categoria: {productos.categoria} \n " +
+                $"Marca {productos.marca} \n " +
+                $"Estado {productos.estado} \n " 
+                )
+            );
+        }
+        if (opcion == "v")
+        {
+            productoService.update(new ProductoModel
+            {
+                id = 1,
+                descripcion = "coca cola 2lts.",
+                cantidad_minima = 1,
+                cantidad_stock = 3,
+                precio_compra = 12000,
+                precio_venta = 18000,
+                categoria = "gaseosa",
+                marca = "coca cola",
+                estado = "disponible"
+            });
+        }
+        if (opcion == "w")
+        {
+            Console.WriteLine("ingresar el id del producto que quiere eliminar");
+            string input = Console.ReadLine();
+            int id_elegidos = int.Parse(input);
+            productoService.delete(id_elegidos);
+        }
+        if (opcion == "x")
+        {
+            Console.WriteLine("Ingrese el id del producto que quieres buscar:");
+            string input = Console.ReadLine();
+            int idSele = int.Parse(input);
+            ProductoModel productos = productoService.get(idSele);
+            if (productos != null)
+            {
+                Console.WriteLine(
+                $"Descripcion: {productos.descripcion} \n " +
+                $"Cantidad minima: {productos.cantidad_minima} \n " +
+                $"Cantidad Stock: {productos.cantidad_stock} \n " +
+                $"Precio Compra: {productos.precio_compra} \n " +
+                $"Precio venta {productos.precio_venta} \n " +
+                $"Categoria {productos.categoria} \n " +
+                $"Marca {productos.marca} \n " +
+                $"Estado: {productos.estado} \n "
+                );
+            }
+            else
+            {
+                Console.WriteLine("Producto no encontrado.");
             }
         }
     }
